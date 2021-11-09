@@ -275,39 +275,47 @@ def get_dash_data():
         date_now = datetime.datetime.now()-datetime.timedelta(hours=1)
         dt_string = date_now.strftime("%Y-%m-%d %H") + ':00:00'
         date_now2 = datetime.datetime.now()-datetime.timedelta(hours=2)
-        dt_string2 = date_now.strftime("%Y-%m-%d %H") + ':00:00'
+        dt_string2 = date_now2.strftime("%Y-%m-%d %H") + ':00:00'
         print("2 jam sebelum", dt_string2)
         print("1 jam sebelum", dt_string)
         print(gedung[0])
-        # sql = "SELECT kwh FROM monitor WHERE id_gedung= "+str(gedung[0])+" AND date='"+dt_string+"' ORDER BY id DESC LIMIT 1 "
-        sql = "SELECT kwh FROM monitor WHERE id_gedung= " + \
-            str(gedung[0])+" ORDER BY id DESC LIMIT 1 "
+        # dt_string = '2021-08-17 11:00:00' 
+        # dt_string2 = '2021-08-17 10:00:00' 
+        sql = "SELECT kwh FROM monitor WHERE id_gedung= "+str(gedung[0])+" AND date='"+dt_string+"' ORDER BY id DESC LIMIT 1 "
+        # sql = "SELECT kwh FROM monitor WHERE id_gedung= " + \
+        #     str(gedung[0])+" ORDER BY id DESC LIMIT 1 "
         cur2.execute(sql)
         kwh_gedung = cur2.fetchall()
-        # sql2 = "SELECT kwh FROM monitor WHERE id_gedung= "+str(gedung[0])+" AND date='"+dt_string2+"' ORDER BY id DESC LIMIT 1 "
-        sql2 = "SELECT kwh from (select * from monitor where id_gedung = "+str(
-            gedung[0])+" ORDER BY id DESC LIMIT 2) table_alias ORDER BY id LIMIT 1"
+        sql2 = "SELECT kwh FROM monitor WHERE id_gedung= "+str(gedung[0])+" AND date='"+dt_string2+"' ORDER BY id DESC LIMIT 1 "
+        # sql2 = "SELECT kwh from (select * from monitor where id_gedung = "+str(
+        #     gedung[0])+" ORDER BY id DESC LIMIT 2) table_alias ORDER BY id LIMIT 1"
         cur2.execute(sql2)
         kwh_gedung2 = cur2.fetchall()
         # kondisi default untuk gedung yang kosong
         print("kwh gedung adalah =")
-        print(kwh_gedung)
+        print(len(kwh_gedung))
         print("kwh gedung adalah 2 =")
-        print(kwh_gedung2)
+        print(len(kwh_gedung2))
         # tup=((-1.0,),)
-        if len(kwh_gedung) == 0:
+        if len(kwh_gedung) == 0 or len(kwh_gedung2) == 0:
             null_kwh.append(idx)
         else:
-            datajam1.append(kwh_gedung[0][0])
-            datajam2.append(kwh_gedung2[0][0])
+            
             delta_kwh = kwh_gedung[0][0]-kwh_gedung2[0][0]
             print("ini delta kwh")
             print(delta_kwh)
-
             collect_dg.append([delta_kwh, delta_kwh])
+        if len(kwh_gedung)!=0:
+            datajam1.append([kwh_gedung[0][0],idx])
+        if len(kwh_gedung2)!=0:
+            datajam2.append([kwh_gedung2[0][0],idx])
+            
+        
     print("ini data jam 1",datajam1)
+    print("ini data jam 2",datajam2)
     print(null_kwh, collect_dg)
     collect_cl = []
+    labels_ = []
     if len(collect_dg) >= 3:
         # if collect_dg[0][0] != 0:
         # if a[0]!=0:
@@ -408,6 +416,7 @@ def get_dash_data():
     idx_collect = 0
     coll = []
     lab = []
+    index_dg = 0
     print(labels_)
     for idx in range(len(data_gedung)):
         if idx in null_kwh:
@@ -425,7 +434,8 @@ def get_dash_data():
                 lab.append(level)
                 idx_collect += 1
             else:
-                coll.append(collect_dg[idx][0])
+                coll.append(collect_dg[index_dg][0])
+                index_dg+=1
                 lab.append(-2)
     
     print(coll)

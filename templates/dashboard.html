@@ -44,8 +44,8 @@
                       </div>
                     </div>
                   </div><br>
-                  <h4 id="datasatu_{{ gedung[0] }}">najib ganteng</h4><br>
-                  <h4 id="datadua_{{ gedung[0] }}">123</h4>
+                  <center><h4 id="datasatu_{{ gedung[0] }}">wait</h4><br></center>
+                  <center><h4 id="datadua_{{ gedung[0] }}">wait</h4></center>
                 </div>
                 <br>
               </div>
@@ -73,8 +73,8 @@ setDataDash();
     $.ajax({
       type: 'GET',
       url: url_link,
-      success: function (data,datasatu,datadua) {
-        console.log(data,datasatu,datadua);
+      success: function (data) {
+        console.log(data);
         for (let i = 0; i < data_gedung.length; i++) {
           
           text = data['kwh'][i].toFixed(4)  + ' kwh';
@@ -82,8 +82,23 @@ setDataDash();
             text = 'No Data';
           }
           document.getElementById( data_gedung[i][0] ).innerHTML = text;
-          document.getElementById( 'datasatu_'+data_gedung[i][0] ).innerHTML = `<center>1 hour before : ${data['datasatu'][i]}</center>`;
-          document.getElementById( 'datadua_'+data_gedung[i][0] ).innerHTML = `<center>2 hour before : ${data['datadua'][i]}</center>`;
+
+          data_satu = data.datasatu.filter(kwh => kwh[1] == i);
+          data_dua = data.datadua.filter(kwh => kwh[1] == i);
+          console.log(data_satu)
+          if (data_satu.length == 0){
+            data_satu=["No data"];
+          }else{
+            data_satu = data_satu[0];
+          }
+          if (data_dua.length == 0){
+            data_dua=["No data"];
+          }else{
+            data_dua = data_dua[0];
+          }
+          
+          document.getElementById( 'datasatu_'+data_gedung[i][0] ).innerHTML = `<center>1 hour before : ${data_satu[0]}</center>`;
+          document.getElementById( 'datadua_'+data_gedung[i][0] ).innerHTML = `<center>2 hour before : ${data_dua[0]}</center>`;
           
           color = '1';
           if (data.data[i] == 1){
