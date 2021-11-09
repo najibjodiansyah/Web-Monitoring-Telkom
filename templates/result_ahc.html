@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% block title%}Result AHC{% endblock %}
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">Result AHC Clustering</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/ahc">AHC</a> </li>
+                        <li class="breadcrumb-item active">Result</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row" id=card_gedung>
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="m-0">Doughnut Visualisation </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <canvas id="pie_chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div>
+                                Silhouette Score : {{'%0.2f'| format(global_silhouette|float) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% set bulan_collection = ['Januari', 'Februari', 'Maret', 'April', 'Mei',
+                'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] %}
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="m-0">{{data_monitor1[0][2]}} - {{ bulan_collection[bulan-1] }} {{ tahun }}
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <table class="table">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <td>Date</td>
+                                                    <td>Time</td>
+                                                    <td>Kwh</td>
+                                                    <td>delta Kwh</td>
+                                                    <td>Cluster</td>
+                                                    <td>Category</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% set level = ["High", "Normal", "Low"] %}
+                                                {% for monitor in data_monitor1 %}
+                                                <tr>
+                                                    <td class="text-center"> {{monitor[1].strftime('%d-%m-%Y')}}
+                                                    </td>
+                                                    <td class="text-center">{{monitor[1].strftime('%H-%M-%S')}}
+                                                    </td>
+                                                    <td class="text-center">{{monitor[3]}}
+                                                    </td>
+                                                    <td class="text-center">{{'%0.5f'| format(delta_kwh1[loop.index - 1]|float) }}
+                                                        <!-- {{delta_kwh1[loop.index - 1]}} -->
+                                                    </td>
+                                                    <td class="text-center">{{res_class1[loop.index - 1]}}</td>
+                                                    <td class="text-center">{{ level[res_class1[loop.index - 1]]
+                                                        }}
+                                                    </td>
+
+
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="m-0">{{data_monitor1[0][2]}} - {{ bulan_collection[bulan-1] }} {{ tahun }}
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <table class="table">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <td>Date</td>
+                                                    <td>Time</td>
+                                                    <td>Kwh</td>
+                                                    <td>delta Kwh</td>
+                                                    <td>Cluster</td>
+                                                    <td>Category</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% set level = ["High", "Normal", "Low"] %}
+                                                {% for monitor in data_monitor2 %}
+                                                <tr>
+                                                    <td class="text-center"> {{monitor[1].strftime('%d-%m-%Y')}}
+                                                    </td>
+                                                    <td class="text-center">{{monitor[1].strftime('%H-%M-%S')}}
+                                                    </td>
+                                                    <td class="text-center">{{monitor[3]}}
+                                                    </td>
+                                                    <td class="text-center">{{'%0.5f'| format(delta_kwh2[loop.index - 1]|float) }}
+                                                        <!-- {{delta_kwh1[loop.index - 1]}} -->
+                                                    </td>
+                                                    <td class="text-center">{{res_class1[loop.index - 1]}}</td>
+                                                    <td class="text-center">{{ level[res_class1[loop.index - 1]]
+                                                        }}
+                                                    </td>
+
+
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <ul class="pagination pagination-sm m-0 float-right">
+                                        {% if page != 0 %}
+                                        <li class="page-item"><a class="page-link"
+                                                href="/result_ahc/{{ bulan }}/{{ tahun}}/{{ gedung }}/{{ page - 1}}">
+                                                prev</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item"><a class="page-link">
+                                                prev</a>
+                                        </li>
+                                        {% endif %}
+                                        {% for number in range(page_numbers) %}
+                                        {% if number == page - 7 %}
+                                        <li class="page-item"><a class="page-link"
+                                                href="/result_ahc/{{ bulan }}/{{ tahun}}/{{ gedung }}/{{ number }}">
+                                                ...</a>
+                                        </li>
+                                        {% endif %}
+                                        {% if number <= page+3 and number>= page - 3 %}
+                                            {% if number == page %}
+                                            <li class="page-item"><a class="page-link">
+                                                    {{number + 1 }}</a>
+                                            </li>
+                                            {% else %}
+                                            <li class="page-item"><a class="page-link"
+                                                    href="/result_ahc/{{ bulan }}/{{ tahun}}/{{ gedung }}/{{ number }}">
+                                                    {{number + 1 }}</a>
+                                            </li>
+                                            {% endif %}
+
+                                            {% endif %}
+                                            {% if number == page + 7 %}
+                                            <li class="page-item"><a class="page-link"
+                                                    href="/result_ahc/{{ bulan }}/{{ tahun}}/{{ gedung }}/{{ number }}">
+                                                    ...</a>
+                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% if page != page_numbers -1 %}
+                                            <li class="page-item"><a class="page-link"
+                                                    href="/result_ahc/{{ bulan }}/{{ tahun}}/{{ gedung }}/{{ page + 1}}">
+                                                    next</a>
+                                            </li>
+                                            {% else %}
+                                            <li class="page-item"><a class="page-link">
+                                                    next</a>
+                                            </li>
+                                            {% endif %}
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+{% endblock %}
+
+{% block script %}
+
+<script>
+    var count_data = JSON.parse('{{ count_data | tojson | safe}}');
+    const context = document.getElementById('pie_chart').getContext('2d');
+    console.log(count_data);
+    const config = {
+        type: 'doughnut',
+        data: {
+            labels: ["Cluster 0 (High)", "Cluster 1 (Normal)", "Cluster 2 (Low)"],
+            datasets: [
+                {
+                    label: "Jumlah",
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        // 'rgba(75, 192, 192, 0.2)',
+                        // 'rgba(153, 102, 255, 0.2)',
+                        // 'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        // 'rgba(75, 192, 192, 1)',
+                        // 'rgba(153, 102, 255, 1)',
+                        // 'rgba(255, 159, 64, 1)'
+                    ],
+                    data: count_data,
+                },
+            ],
+        },
+        options: {
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItems, data) {
+                        var sum = 0;
+                        for (let idx = 0; idx < count_data.length; idx++) {
+                            sum += count_data[idx];
+                        }
+
+                        var persen = data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]/sum * 100;
+
+                        return data.labels[tooltipItems.index] + 
+                        " : " + 
+                        persen.toFixed(2) +
+                        ' %';
+                    }
+                }
+            }
+        }
+    };
+
+    var chart = new Chart(context, config);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,431 @@
+{% extends 'base.html' %}
+{% block title%}DBSCAN{% endblock %}
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">DBSCAN Clustering</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Set Analisis</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"> Set Data per Month</h3>
+                        </div>
+                        <!-- <form> -->
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Building</label>
+                                <select class="form-control" name="gedung" id="gedung" onchange="selected_click()">
+                                    {% for gedung in data_gedung %}
+                                    <option onclick="on_selected_click({{gedung[0]}})" value="{{gedung[0]}}">{{ gedung[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Month</label>
+                                <select class="form-control" name="bulan" id="bulan" onchange="selected_click()">
+                                    <!-- {% for bulan in data_bulan %} -->
+                                    <option value="0">-</option>
+                                    <!-- {% endfor %} -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Year</label>
+                                <select class="form-control" name="tahun" id="tahun">
+                                    <!-- {% for bulan in data_bulan %} -->
+                                    <option value="0">-</option>
+                                    <!-- {% endfor %} -->
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div class="card-footer">
+                            <button id="button_submit" onclick="do_algo()" class="btn btn-primary">Submit</button>
+                        </div>
+                        <!-- </form> -->
+                    </div>
+                    <br>
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"> Set Data per Day</h3>
+                        </div>
+                        <!-- <form> -->
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Building</label>
+                                <select class="form-control" name="gedung2" id="gedung2" onchange="on_selected_click2(0)">
+                                    {% for gedung in data_gedung %}
+                                    <option onclick="on_selected_click2({{gedung[0]}})" value="{{gedung[0]}}">{{ gedung[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Year</label>
+                                <select class="form-control" name="tahun2" id="tahun2" onchange="selected_year_click()" required>
+                                    <!-- {% for bulan in data_bulan %} -->
+                                    <option value="">-</option>
+                                    <!-- {% endfor %} -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Month</label>
+                                <select class="form-control" name="bulan2" id="bulan2" onchange="selected_month_click()" required>
+                                    <!-- {% for bulan in data_bulan %} -->
+                                    <option value=""></option>
+                                    <!-- {% endfor %} -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Day</label>
+                                <select class="form-control" name="hari2" id="hari2" required>
+                                    <!-- {% for bulan in data_bulan %} -->
+                                    <option value="">-</option>
+                                    <!-- {% endfor %} -->
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="card-footer">
+                            <button id="button_submit" onclick="do_algo2()" class="btn btn-primary">Submit</button>
+                        </div>
+                        <!-- </form> -->
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+        <!-- /.row -->
+    </div>
+</div>
+<!-- /.content -->
+</div>
+<br>
+<!-- /.content-wrapper -->
+{% endblock %}
+
+{% block script %}
+
+<script>
+    button_submit = document.getElementById("button_submit");
+
+    s_gedung = document.getElementById("gedung");
+    s_bulan = document.getElementById("bulan");
+    s_tahun = document.getElementById("tahun");
+
+    s_gedung2 = document.getElementById("gedung2");
+    s_bulan2 = document.getElementById("bulan2");
+    s_tahun2 = document.getElementById("tahun2");
+    s_hari2 = document.getElementById("hari2")
+
+    bulan_selected = 13;
+
+    opt_gedung = s_gedung.getElementsByTagName("option");
+    opt_bulan = s_bulan.getElementsByTagName("option");
+    opt_tahun = s_tahun.getElementsByTagName("option");
+
+    opt_bulan2 = s_bulan2.getElementsByTagName("option");
+    opt_tahun2 = s_tahun2.getElementsByTagName("option");
+    opt_hari2 = s_hari2.getElementsByTagName("option")
+
+    on_selected_click2(0);
+    selected_click();
+    function selected_click(){
+        console.log("test click");
+        on_selected_click(s_gedung.value);
+
+    }
+
+    function selected_year_click(){
+        s_gedung2 = document.getElementById("gedung2");
+        tahun_ = document.getElementById("tahun2");
+        console.log("test click");
+        on_selected_click2(s_gedung2.value, tahun_.value);
+    }
+
+    function selected_month_click(){
+        s_gedung2 = document.getElementById("gedung2");
+        tahun_ = document.getElementById("tahun2");
+        bulan_ = document.getElementById("bulan2");
+        console.log("test click");
+        on_selected_click2(s_gedung2.value,tahun_.value, bulan_.value);
+    }
+
+   
+    // function selected_click2(){
+    //     s_gedung2 = document.getElementById("gedung2");
+    //     console.log("test click");
+    //     on_selected_click2(s_gedung2.value);
+
+    // }
+
+
+    function disable_opt(value){
+        button_submit.disabled = value;
+        s_gedung.disabled = value;
+        s_bulan.disabled = value;
+        s_tahun.disabled = value;
+        s_bulan2.disabled = value;
+    }
+
+    function on_selected_click(id_gedung){
+
+        console.log("click");
+        url_link = "/get_opt_date/" + id_gedung;
+        disable_opt(true);
+        $.ajax({
+            type: 'GET',
+            url: url_link,
+            success: function (data) {
+                bulan_collection = ['Januari', 'Februari', 'Maret', 'April', 'Mei',
+                    'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                
+                // data_bulan = [];
+                // data_tahun = [];
+                str_to_html = "";
+                for(x = 0; x < data.data.bulan.length; x++){
+                    // data_bulan.push(data.data.bulan[x]);
+                    selected = "";
+                    console.log(data.data.bulan[x],bulan_selected);
+                    if(data.data.bulan[x] == s_bulan.value){
+                        selected = "selected";
+                    }
+                    str_to_html += '<option '+selected+' value='+  data.data.bulan[x] +'>'+ bulan_collection[ data.data.bulan[x]-1] +'</option>';
+                }
+                s_bulan.innerHTML = str_to_html;
+                str_to_html = "";
+                for(x = 0; x < data.data.tahun.length; x++){
+                    // if(data.data.tahun[x][0] == parseInt(s_bulan.value)){
+                        str_to_html += '<option value='+ data.data.tahun[x] +'>'+ data.data.tahun[x] +'</option>';
+                    // }
+                    
+                }
+                s_tahun.innerHTML = str_to_html;
+                disable_opt(false);
+            }
+        })
+    }
+    // dibalik cari tahun dulu 
+    function on_selected_click2(id_gedung, tahun=-1, bulan=-1){
+    id_gedung = document.getElementById('gedung2').value;
+    console.log("click");
+    url_link = "/get_opt_day/" + id_gedung +'/'+tahun+'/'+bulan;
+    disable_opt(true);
+    $.ajax({
+    type: 'GET',
+    url: url_link,
+    success: function (data) {
+        console.log(data);
+        bulan_collection2 = ['Januari', 'Februari', 'Maret', 'April', 'Mei',
+                'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            // data_bulan = [];
+            // data_tahun = [];
+            if ((tahun == -1 && bulan == -1) || (tahun != -1 && bulan == -1)){
+                str_to_html = '<option selected disabled value="">Month</option>';
+                for(x = 0; x < data.data.bulan.length; x++){
+                    // data_bulan.push(data.data.bulan[x]);
+                    selected = "";
+                    console.log(data.data.bulan[x],bulan_selected);
+                    if(data.data.bulan[x] == s_bulan2.value){
+                        selected = "selected";
+                    }
+                    str_to_html += '<option '+selected+' value='+  data.data.bulan[x] +'>'+ bulan_collection2[ data.data.bulan[x]-1] +'</option>';
+                }
+                s_bulan2.innerHTML = str_to_html;
+            }
+            
+            str_to_html = '<option selected disabled value="">Day</option>';
+            for(x = 0; x < data.data.hari.length; x++){
+                selected="";
+                // if(data.data.hari[x] == s_hari2.value){
+                    // selected = "selected";
+                // }
+            str_to_html += '<option value='+ data.data.hari[x] +'>'+ data.data.hari[x] +'</option>';
+            }
+
+            s_hari2.innerHTML = str_to_html;    
+            
+            if (tahun == -1 && bulan == -1){
+                str_to_html = '<option selected disabled value="">Year</option>';
+                for(x = 0; x < data.data.tahun.length; x++){
+                    // if(data.data.completed[x][0] == parseInt(s_bulan2.value)){
+                        str_to_html += '<option value='+ data.data.tahun[x] +'>'+ data.data.tahun[x] +'</option>';
+                    // }
+        
+                }
+                s_tahun2.innerHTML = str_to_html;
+            }
+            disable_opt(false);
+
+            
+        }
+    })
+    }
+
+    // function on_selected_hari(){
+    // console.log("click");
+    // id_gedung = document.getElementById('gedung2').value;
+    // hari = document.getElementById('hari2').value;
+    // url_link = "/get_opt_day/" + id_gedung +"/"+hari+'/-1';
+    // disable_opt(true);
+    // $.ajax({
+    // type: 'GET',
+    // url: url_link,
+    // success: function (data) {
+    //     bulan_collection2 = ['Januari', 'Februari', 'Maret', 'April', 'Mei',
+    //             'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+    //         // data_bulan = [];
+    //         // data_tahun = [];
+    //         str_to_html = "";
+    //         for(x = 0; x < data.data.bulan.length; x++){
+    //             // data_bulan.push(data.data.bulan[x]);
+    //             selected = "";
+    //             console.log(data.data.bulan[x],bulan_selected);
+    //             if(data.data.bulan[x] == s_bulan2.value){
+    //                 selected = "selected";
+    //             }
+    //             str_to_html += '<option '+selected+' value='+  data.data.bulan[x] +'>'+ bulan_collection2[ data.data.bulan[x]-1] +'</option>';
+    //         }
+    //         s_bulan2.innerHTML = str_to_html;
+            
+    //         // str_to_html = "";
+    //         // for(x = 0; x < data.data.hari.length; x++){
+    //         //     selected="";
+    //         //     if(data.data.hari[x] == s_hari2.value){
+    //         //         selected = "selected";
+    //         //     }
+    //         // str_to_html += '<option '+ selected +' value='+ data.data.hari[x] +'>'+ data.data.hari[x] +'</option>';
+    //         // }
+
+    //         // s_hari2.innerHTML = str_to_html;    
+
+    //         str_to_html = "";
+    //         for(x = 0; x < data.data.tahun.length; x++){
+    //             // if(data.data.tahun[x] == parseInt(s_bulan2.value)){
+    //                 str_to_html += '<option value='+ data.data.tahun[x] +'>'+ data.data.tahun[x]+'</option>';
+    //             // }
+    
+    //         }
+    //         s_tahun2.innerHTML = str_to_html;
+    //         disable_opt(false);
+
+            
+    //     }
+    // })
+    // }
+
+    // function on_selected_bulan(){
+    // console.log("click");
+    // bulan = document.getElementById('bulan2').value;
+    // id_gedung = document.getElementById('gedung2').value;
+    // hari = document.getElementById('hari2').value;
+    // url_link = "/get_opt_day/" + id_gedung +"/"+hari+'/'+bulan;
+    // disable_opt(true);
+    // $.ajax({
+    // type: 'GET',
+    // url: url_link,
+    // success: function (data) {
+    //     bulan_collection2 = ['Januari', 'Februari', 'Maret', 'April', 'Mei',
+    //             'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+    //         // data_bulan = [];
+    //         // data_tahun = [];
+    //         // str_to_html = "";
+    //         // for(x = 0; x < data.data.bulan.length; x++){
+    //         //     // data_bulan.push(data.data.bulan[x]);
+    //         //     selected = "";
+    //         //     console.log(data.data.bulan[x],bulan_selected);
+    //         //     if(data.data.bulan[x] == s_bulan2.value){
+    //         //         selected = "selected";
+    //         //     }
+    //         //     str_to_html += '<option '+selected+' value='+  data.data.bulan[x] +'>'+ bulan_collection2[ data.data.bulan[x]-1] +'</option>';
+    //         // }
+    //         // s_bulan2.innerHTML = str_to_html;
+            
+    //         // str_to_html = "";
+    //         // for(x = 0; x < data.data.hari.length; x++){
+    //         //     selected="";
+    //         //     if(data.data.hari[x] == s_hari2.value){
+    //         //         selected = "selected";
+    //         //     }
+    //         // // str_to_html += '<option '+ selected +' value='+ data.data.hari[x] +'>'+ data.data.hari[x] +'</option>';
+    //         // }
+
+    //         // s_hari2.innerHTML = str_to_html;    
+
+    //         str_to_html = "";
+    //         for(x = 0; x < data.data.tahun.length; x++){
+    //             if(data.data.tahun[x][0] == parseInt(s_bulan2.value)){
+    //                 str_to_html += '<option value='+ data.data.tahun[x] +'>'+ data.data.tahun[x] +'</option>';
+    //             }
+    
+    //         }
+    //         s_tahun2.innerHTML = str_to_html;
+    //         disable_opt(false);
+
+            
+    //     }
+    // })
+    // }
+
+
+    function do_algo() {
+        bulan = document.getElementById("bulan").value;
+        tahun = document.getElementById("tahun").value;
+        gedung = document.getElementById("gedung").value;
+
+        url_link = "/result_dbscan/" + bulan + "/" + tahun + "/" + gedung + "/" + 0;
+        console.log(bulan, gedung, url_link);
+        location.replace(url_link);
+    }
+
+    function do_algo2() {
+        bulan = document.getElementById("bulan2").value;
+        tahun = document.getElementById("tahun2").value;
+        gedung = document.getElementById("gedung2").value;
+        hari = document.getElementById("hari2").value;
+        
+        if (tahun==""){
+            alert("Year not selected yet")
+            // location.replace("/kmeansplus")
+        }
+        else if (bulan==""){
+            alert("Month not selected yet")
+            // location.replace("/kmeansplus")
+        }
+        else if (hari==""){
+            alert("Day not selected yet")
+            // location.replace("/kmeansplus")
+        }
+        else {
+        url_link = "/result_dbscanday/" + hari + "/" + bulan + "/" + tahun + "/" + gedung + "/" + 0;
+        console.log(bulan, gedung, url_link);
+        location.replace(url_link);}
+    }
+</script>
+
+{% endblock %}
