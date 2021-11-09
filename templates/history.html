@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title%}History{% endblock %}
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">History</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">Dashboard</a> </li>
+              <li class="breadcrumb-item active">History</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="m-0">Monitor Electricity Usage Records</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="canvas" style="height: 300px; padding: 0px; position: relative;">
+                </canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}
+{% block script %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+
+  <script>
+    const config = {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+        ],
+      },
+      options: {
+        responsive: true,
+        title: {
+          display: true,
+          text: 'KWH Setiap Gedung'
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Time'
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'KWH'
+            }
+          }]
+        }
+      }
+    };
+    const context = document.getElementById('canvas').getContext('2d');
+    const lineChart = new Chart(context, config);
+
+    $(document).ready(function () {
+
+      set_chart_data(start = true);
+      setInterval(set_chart_data, 5000);
+    });
+
+
+
+    function set_chart_data(start = false) {
+      getDataKwh();
+      getDataGedung();
+
+      data_gedung = JSON.parse(localStorage.getItem("data_gedung"));
+      data_kwh = JSON.parse(localStorage.getItem("collect_dg"));
+
+      console.log(data_gedung, data_kwh);
+
+      // const context = document.getElementById('canvas').getContext('2d');
+      // const lineChart = new Chart(context, config);
+      if (start) {
+
+        config.data.datasets = [];
+      }
+
+      if (config.data.labels.length === 12) {
+        config.data.labels.shift();
+      }
+
+
+      for (i = 0; i < data_kwh.length; i++) {
+
+        if (start) {
+          config.data.datasets.push({
+            label: data_gedung[i][2],
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [],
+            fill: false,
+          });
+        }
+        if (config.data.labels.length === 12) {
+          config.data.datasets[i].data.shift();
+        }
+
+        config.data.datasets[i].data.push(data_kwh[i]);
+        console.log(config);
+
+        // const source = new EventSource("/chart-data");
+
+        // source.onmessage = function (event) {
+        //   const data = JSON.parse(event.data);
+        //   // console.log(config.data.labels)
+        //   if (config.data.labels.length === 20) {
+        //     config.data.labels.shift();
+        //     config.data.datasets[0].data.shift();
+        //     config.data.datasets[1].data.shift();
+        //     config.data.datasets[2].data.shift();
+        //   }
+        //   config.data.labels.push(data.time);
+        //   config.data.datasets[0].data.push(data.value[0]);
+        //   config.data.datasets[1].data.push(data.value[1]);
+        //   config.data.datasets[2].data.push(data.value[2]);
+        //   lineChart.update();
+        // }
+      }
+
+      time = new Date();
+      config.data.labels.push(time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds());
+
+      lineChart.update();
+
+    }
+
+    function getDataKwh() {
+      url_link = "/get_dash_data";
+      $.ajax({
+        type: 'GET',
+        url: url_link,
+        success: function (data) {
+          localStorage.setItem("collect_dg", JSON.stringify(data.kwh));
+        }
+      });
+    }
+
+    function getDataGedung() {
+      url_link = "/get_gd";
+      $.ajax({
+        type: 'GET',
+        url: url_link,
+        success: function (data) {
+          localStorage.setItem("data_gedung", JSON.stringify(data.data));
+        }
+      });
+    }
+  </script>
+
+{% endblock %}

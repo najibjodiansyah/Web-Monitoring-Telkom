@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title%}Buildings{% endblock %}
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Building Form</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">Dashboard</a> </li>
+              <li class="breadcrumb-item active">Building Form</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">New Building</h3>
+              </div>
+              <form role="form" action="/tambah_gedung" method="POST">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label>Name</label>
+                    <input class="form-control form-control-lg" type="text" placeholder="Nama Gedung" name="nama" required>
+                  </div>
+                  <!-- <div class="form-group">
+                    <label>Blok</label>
+                    <select class="form-control" name="jumlah_blok">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                  </div> -->
+                  <div class="form-group">
+                    <label>Location</label>
+                    <input class="form-control form-control-lg" type="text" placeholder="Lokasi" name="lokasi" required>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+              </form>
+            </div>
+
+
+          </div>
+          <!-- <div class="col-sm-6">
+                <div class="card card-primary">
+                    <div class="card-header">
+                      <h3 class="card-title">Hapus Gedung</h3>
+                    </div>
+                    <form role="form">
+                        <div class="card-body">
+                        <div class="form-group">
+                        <input class="form-control form-control-lg" type="text" placeholder="Nama Gedung">
+                        <br>
+                    </div>
+                        </div>
+                          <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Delete!</button>
+                          </div>
+                    </form>
+                </div> -->
+        </div>
+        <br>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-body">
+              <table class="table" {% if session["username"] != "admin" %} hidden {% endif %} >
+                <tr>
+                  <th class="text-center"> No </th>
+                  <th class="text-center"> Building Name </th>
+                  <th class="text-center"> Location </th>
+                  <th class="text-center"> Chancelor </th>
+                  <th class="text-center"> Action </th>
+                </tr>
+
+                {% for gedung in data_gedung: %}
+                <tr>
+                  <td class="text-center">{{loop.index}}</td>
+                  <td class="text-center">{{gedung[2]}}</td>
+                  <td class="text-center">{{gedung[3]}}</td>
+                  <td class="text-center">{{gedung[1]}}</td>
+                  <td class="text-center">
+                    <!-- <a href="/data_blok/{{gedung[0]}}" class="btn btn-primary">Blok</a> -->
+                    <a onclick="delete_gedung({{gedung[0]}})" class="btn btn-primary">Delete</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+
+  <script>
+    function delete_gedung(id) {
+      url_link = "/hapus_gedung/" + id;
+      $.ajax({
+        type: 'POST',
+        url: url_link,
+        success: function (e) {
+          location.replace("/formgd")
+        }
+      })
+
+    }
+  </script>
+{% endblock %}
