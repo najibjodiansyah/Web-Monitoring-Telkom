@@ -333,11 +333,11 @@ def get_dash_data():
         labels_ = labels_.tolist()
         collect_cl = collect_cl.tolist()
         print(labels_)
-        from sklearn import metrics
-        from sklearn.metrics import silhouette_score
-        global_silhouette = metrics.silhouette_score(
-            collect_cl, labels=labels_)
-        print("silhouette score: ", global_silhouette)
+        # from sklearn import metrics
+        # from sklearn.metrics import silhouette_score
+        # global_silhouette = metrics.silhouette_score(
+        #     collect_cl, labels=labels_)
+        # print("silhouette score: ", global_silhouette)
         
         # pengelompokan data cluster
         sub_1 = []
@@ -606,13 +606,13 @@ def result_kmeansplus(bulan, tahun, gedung, page=0):
         old_kwh.append(data[3])
     old_kwh.pop()
     print("ini old kwh")
-    print(old_kwh)
+    # print(old_kwh)
 
     kwh = []
     print('ini kwh asli')
     for data in data_monitor:
         kwh.append(data[3])
-    print(kwh)
+    # print(kwh)
 
     delta_kwh = []
     for i, delta in enumerate(kwh):
@@ -620,13 +620,13 @@ def result_kmeansplus(bulan, tahun, gedung, page=0):
     delta_kwh[0] = 0
 
     print("ini delta kwh")
-    print(delta_kwh)
+    # print(delta_kwh)
     # kalo data x lebih = dari 3 jalan kan
     data_X = []
     for monitor in delta_kwh:
         data_X.append([monitor, monitor])
 
-    print(data_X)
+    # print(data_X)
 
     # proses Clustering
     # konversi dari list ke numpy array
@@ -639,10 +639,13 @@ def result_kmeansplus(bulan, tahun, gedung, page=0):
     model.fit_predict(data_X)
     # assign a cluster to each example
     labels_ = model.fit_predict(data_X)
-    while delta_kwh[i] == 0:
-        global_silhouette = 0.1
+    print ("ini delta kwh", len(delta_kwh))
+    i = 0
+    while labels_[i] == 0:
+        global_silhouette = -1
         i += 1
-        if i > 5:
+        print(i)
+        if len(delta_kwh) == i:
             break  # This is the same as count = count + 1
     else:
         # gadipake karna hasil labels != n_cluster - 1
@@ -851,11 +854,12 @@ def result_kmeansday(hari, bulan, tahun, gedung, page=0):
     labels_ = model.fit_predict(data_X)
     labels_ = labels_
     print("labelsnya:", labels_)
-    # i = 0
-    while delta_kwh[0] == 0:
-        global_silhouette = 0.1
+    i = 0
+    print(delta_kwh)
+    while labels_[i] == 0:
+        global_silhouette = -1
         i += 1
-        if i > 5:
+        if len(delta_kwh) == i:
             break  # This is the same as count = count + 1
     else:
         # gadipake karna hasil labels != n_cluster - 1
@@ -1086,10 +1090,12 @@ def result_ahc(bulan, tahun, gedung, page=0):
     model.fit(data_X)
     # assign a cluster to each example
     labels_ = model.fit_predict(data_X)
-    while delta_kwh[i] == 0:
-        global_silhouette = 0.1
+    i = 0
+    print(delta_kwh)
+    while labels_[i] == 0:
+        global_silhouette = -1
         i += 1
-        if i > 5:
+        if len(delta_kwh) == i:
             break  # This is the same as count = count + 1
     else:
         # gadipake karna hasil labels != n_cluster - 1
@@ -1295,10 +1301,13 @@ def result_ahcday(hari, bulan, tahun, gedung, page=0):
     labels_ = labels_
     print("labelsnya:", labels_)
     # i = 0
-    while delta_kwh[0] == 0:
-        global_silhouette = 0.1
+    i = 0
+    print(delta_kwh)
+    print(labels_)
+    while labels_[i] == 0:
+        global_silhouette = -1
         i += 1
-        if i > 5:
+        if len(delta_kwh) == i:
             break  # This is the same as count = count + 1
     else:
         # gadipake karna hasil labels != n_cluster - 1
@@ -1535,18 +1544,21 @@ def result_dbscan(bulan, tahun, gedung, page=0):
     model.fit(data_X)
     # assign a cluster to each example
     labels_ = model.fit_predict(data_X)
-    while delta_kwh[i] == 0:
-        global_silhouette = 0.1
+    i = 0
+    
+    while labels_[i] == 0:
+        global_silhouette = -1
         i += 1
-        if i > 5:
+        print(labels_)
+        if len(delta_kwh) == i:
             break  # This is the same as count = count + 1
+        print("default")
     else:
         # gadipake karna hasil labels != n_cluster - 1
         from sklearn import metrics
         from sklearn.metrics import silhouette_score
-        global_silhouette = -1
-        print("silhouette score: ", global_silhouette)
-
+        global_silhouette = metrics.silhouette_score(data_X, labels=labels_)
+        print("hasil dari library silhouette score: ", global_silhouette)
     # buat gambar koordinat hasil clustering data_X
     clusters = unique(labels_)
     print(clusters)
@@ -1746,17 +1758,20 @@ def result_dbscanday(hari, bulan, tahun, gedung, page=0):
     labels_ = labels_
     print("labelsnya:", labels_)
     # i = 0
-    while delta_kwh[0] == 0:
-        global_silhouette = 0.1
+    i = 0
+    print(delta_kwh)
+    while labels_[i] == 0:
+        global_silhouette = -1
         i += 1
-        if i > 5:
+        if len(delta_kwh) == i:
             break  # This is the same as count = count + 1
+        print("default")
     else:
         # gadipake karna hasil labels != n_cluster - 1
         from sklearn import metrics
         from sklearn.metrics import silhouette_score
         global_silhouette = metrics.silhouette_score(data_X, labels=labels_)
-        print("silhouette score: ", global_silhouette)
+        print("hasil dari library silhouette score: ", global_silhouette)
 
     # buat gambar koordinat hasil clustering data_X
     clusters = unique(labels_)
