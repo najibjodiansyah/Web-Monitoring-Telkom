@@ -5,7 +5,7 @@ Web App that inform you the realtime electricity usage from each Telkom Universi
 how to use :
 1. clone the repo
 ```
-git clone url
+git clone https://github.com/najibjodiansyah/WebMon.git
 ```
 2. Download python package requirement
 ```
