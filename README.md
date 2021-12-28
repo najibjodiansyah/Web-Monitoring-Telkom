@@ -20,9 +20,7 @@ contact me for the db
 python data_5.py
 ```
 5. youre save in 127.0.0.1:4321
-```
-python data_5.py
-```
+
 
 
 ### run file
